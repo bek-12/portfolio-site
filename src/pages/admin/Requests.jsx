@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Search, Mail, Phone, Building2, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import LoadingScreen from '../../components/ui/LoadingScreen';
 import { demoRequestsAPI } from '../../utils/api';
 
 const STATUS_OPTIONS = ['new', 'contacted', 'demo scheduled', 'closed'];
@@ -87,12 +88,20 @@ function RequestRow({ request, onStatusChange }) {
 }
 
 export default function Requests() {
-  const [requests, setRequests] = useState([]);
-  const [search, setSearch] = useState('');
+  const [requests, setRequests]       = useState([]);
+  const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [loading, setLoading]         = useState(true);
 
-  const load = () => demoRequestsAPI.getAll().then(setRequests).catch(() => {});
+  const load = () =>
+    demoRequestsAPI.getAll()
+      .then(setRequests)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+
   useEffect(() => { load(); }, []);
+
+  if (loading) return <LoadingScreen message="Loading requests..." />;
 
   const handleStatusChange = async (id, status) => {
     try {

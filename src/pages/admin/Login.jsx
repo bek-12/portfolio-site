@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Zap, Eye, EyeOff, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/ui/Button';
+import LoadingScreen from '../../components/ui/LoadingScreen';
 
 export default function Login() {
   const { login } = useAuth();
@@ -21,9 +22,12 @@ export default function Login() {
       navigate('/admin/dashboard');
     } else {
       setError(result.error || 'Invalid username or password.');
+      setLoading(false);
     }
-    setLoading(false);
   };
+
+  // Show full-screen loader while the API call is in flight
+  if (loading) return <LoadingScreen message="Signing in..." />;
 
   const inputStyle = {
     background: '#0a0a0a',
@@ -119,14 +123,7 @@ export default function Login() {
             )}
 
             <Button type="submit" className="w-full mt-2" size="lg" disabled={loading}>
-              {loading ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                'Sign In'
-              )}
+              Sign In
             </Button>
           </form>
 

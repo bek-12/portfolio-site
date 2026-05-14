@@ -4,18 +4,27 @@ import AdminLayout from '../../components/admin/AdminLayout';
 import ProjectForm from '../../components/admin/ProjectForm';
 import { StatusBadge, TechBadge } from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
+import LoadingScreen from '../../components/ui/LoadingScreen';
 import { projectsAPI } from '../../utils/api';
 
 export default function Projects() {
-  const [projects, setProjects] = useState([]);
-  const [search, setSearch] = useState('');
-  const [modal, setModal] = useState(null);
+  const [projects, setProjects]       = useState([]);
+  const [search, setSearch]           = useState('');
+  const [modal, setModal]             = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+  const [saving, setSaving]           = useState(false);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState('');
 
-  const load = () => projectsAPI.getAll().then(setProjects).catch(() => {});
+  const load = () =>
+    projectsAPI.getAll()
+      .then(setProjects)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+
   useEffect(() => { load(); }, []);
+
+  if (loading) return <LoadingScreen message="Loading projects..." />;
 
   const filtered = projects.filter(
     (p) =>

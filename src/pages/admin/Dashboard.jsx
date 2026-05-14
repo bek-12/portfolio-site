@@ -2,17 +2,26 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FolderKanban, MessageSquare, CheckCircle2, TrendingUp, ArrowRight } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import LoadingScreen from '../../components/ui/LoadingScreen';
 import { projectsAPI, demoRequestsAPI } from '../../utils/api';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading]   = useState(true);
 
   useEffect(() => {
-    projectsAPI.getAll().then(setProjects).catch(() => {});
-    demoRequestsAPI.getAll().then(setRequests).catch(() => {});
+    Promise.all([
+      projectsAPI.getAll().catch(() => []),
+      demoRequestsAPI.getAll().catch(() => []),
+    ]).then(([p, r]) => {
+      setProjects(p);
+      setRequests(r);
+    }).finally(() => setLoading(false));
   }, []);
+
+  if (loading) return <LoadingScreen message="Loading dashboard..." />;
 
   const stats = [
     {
