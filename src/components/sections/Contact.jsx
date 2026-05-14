@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Send, CheckCircle2, Mail, Phone, MapPin, Clock } from 'lucide-react';
-import { addDemoRequest, getProjects } from '../../data/store';
+import { demoRequestsAPI, projectsAPI } from '../../utils/api';
 import Button from '../ui/Button';
 
 const EMPTY_FORM = {
@@ -27,7 +27,7 @@ export default function Contact({ preselectedSystem = '' }) {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    setProjects(getProjects());
+    projectsAPI.getAll().then(setProjects).catch(() => setProjects([]));
   }, []);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function Contact({ preselectedSystem = '' }) {
     if (errors[name]) setErrors((err) => ({ ...err, [name]: '' }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const e2 = validate();
     if (Object.keys(e2).length) {
@@ -60,12 +60,15 @@ export default function Contact({ preselectedSystem = '' }) {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      addDemoRequest(form);
+    try {
+      await demoRequestsAPI.create(form);
       setSubmitted(true);
-      setLoading(false);
       setForm(EMPTY_FORM);
-    }, 800);
+    } catch (err) {
+      setErrors({ message: err.message || 'Failed to submit. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputBase =

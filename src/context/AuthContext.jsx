@@ -1,40 +1,27 @@
 import { createContext, useContext, useState } from 'react';
-
-const ADMIN_USERNAME = 'bmadmin';
-const BRAND_KEY = 'bm_brand';
-
-// Always read the live password from localStorage so profile changes take effect immediately
-function getCurrentPassword() {
-  try {
-    const raw = localStorage.getItem(BRAND_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed.password) return parsed.password;
-    }
-  } catch {
-    // fall through
-  }
-  return 'BMSoftware2025!';
-}
+import { authAPI, setToken, clearToken, getToken } from '../utils/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(
-    () => sessionStorage.getItem('bm_auth') === 'true'
+    () => Boolean(getToken())
   );
 
-  function login(username, password) {
-    if (username === ADMIN_USERNAME && password === getCurrentPassword()) {
-      sessionStorage.setItem('bm_auth', 'true');
+  // Returns { ok: true } or { ok: false, error: string }
+  async function login(username, password) {
+    try {
+      const data = await authAPI.login(username, password);
+      setToken(data.token);
       setIsAuthenticated(true);
-      return true;
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err.message };
     }
-    return false;
   }
 
   function logout() {
-    sessionStorage.removeItem('bm_auth');
+    clearToken();
     setIsAuthenticated(false);
   }
 

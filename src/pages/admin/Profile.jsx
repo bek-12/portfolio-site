@@ -9,6 +9,7 @@ import Button from '../../components/ui/Button';
 import { useBrand } from '../../context/BrandContext';
 import { useToast } from '../../components/ui/Toast';
 import { uploadToCloudinary } from '../../utils/cloudinary';
+import { authAPI } from '../../utils/api';
 
 // ─── Shared style constants (module-level) ────────────────────────────────────
 const inputBase =
@@ -434,11 +435,16 @@ function PersonalInfoSection() {
     return e;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const e = validate();
     if (Object.keys(e).length) { setErrors(e); return; }
-    updateBrand({ fullName: fullName.trim(), email: email.trim(), phone: phone.trim() });
-    addToast({ message: 'Profile information saved successfully.' });
+    try {
+      await authAPI.updateProfile({ fullName: fullName.trim(), email: email.trim(), phone: phone.trim() });
+      updateBrand({ fullName: fullName.trim(), email: email.trim(), phone: phone.trim() });
+      addToast({ message: 'Profile information saved successfully.' });
+    } catch (err) {
+      addToast({ message: err.message || 'Failed to save profile.', type: 'error' });
+    }
   };
 
   return (
@@ -532,16 +538,21 @@ function ChangePasswordSection() {
     return e;
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     const e = validate();
     if (Object.keys(e).length) {
       setErrors(e);
       addToast({ message: 'Please fix the errors below.', type: 'error' });
       return;
     }
-    updateBrand({ password: newPw });
-    setCurrentPw(''); setNewPw(''); setConfirmPw(''); setErrors({});
-    addToast({ message: 'Password updated. Use your new password next time you log in.' });
+    try {
+      await authAPI.changePassword(currentPw, newPw);
+      setCurrentPw(''); setNewPw(''); setConfirmPw(''); setErrors({});
+      addToast({ message: 'Password updated successfully.' });
+    } catch (err) {
+      setErrors({ currentPw: err.message || 'Failed to update password.' });
+      addToast({ message: err.message || 'Failed to update password.', type: 'error' });
+    }
   };
 
   const strength = getStrength(newPw);

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { getProjects } from '../../data/store';
+import { projectsAPI } from '../../utils/api';
 import ProjectCard from './ProjectCard';
 
 export default function Systems({ onRequestDemo }) {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    setProjects(getProjects());
+    projectsAPI.getAll()
+      .then(setProjects)
+      .catch(() => setProjects([]));
   }, []);
 
   return (

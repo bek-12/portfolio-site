@@ -12,19 +12,17 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    setTimeout(() => {
-      const ok = login(form.username, form.password);
-      if (ok) {
-        navigate('/admin/dashboard');
-      } else {
-        setError('Invalid username or password.');
-      }
-      setLoading(false);
-    }, 600);
+    const result = await login(form.username, form.password);
+    if (result.ok) {
+      navigate('/admin/dashboard');
+    } else {
+      setError(result.error || 'Invalid username or password.');
+    }
+    setLoading(false);
   };
 
   const inputStyle = {
@@ -35,7 +33,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
-      {/* Background grid */}
       <div
         className="fixed inset-0 opacity-[0.04] pointer-events-none"
         style={{
@@ -54,14 +51,10 @@ export default function Login() {
           className="rounded-2xl p-8 shadow-2xl shadow-black/60"
           style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.2)' }}
         >
-          {/* Logo */}
           <div className="flex flex-col items-center mb-8">
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg mb-4"
-              style={{
-                background: 'linear-gradient(135deg, #C9A84C, #E2C068)',
-                boxShadow: '0 4px 20px rgba(201,168,76,0.3)',
-              }}
+              style={{ background: 'linear-gradient(135deg, #C9A84C, #E2C068)', boxShadow: '0 4px 20px rgba(201,168,76,0.3)' }}
             >
               <Zap className="w-6 h-6 text-black" />
             </div>
@@ -69,13 +62,9 @@ export default function Login() {
             <p className="text-sm text-[#A0A0A0] mt-1">Admin Portal</p>
           </div>
 
-          {/* Notice */}
           <div
             className="flex items-center gap-3 p-4 rounded-xl mb-6"
-            style={{
-              background: 'rgba(201,168,76,0.08)',
-              border: '1px solid rgba(201,168,76,0.2)',
-            }}
+            style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)' }}
           >
             <Lock className="w-4 h-4 shrink-0" style={{ color: '#C9A84C' }} />
             <p className="text-sm" style={{ color: '#C9A84C' }}>
@@ -117,7 +106,6 @@ export default function Login() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555] hover:text-[#A0A0A0] transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -143,10 +131,7 @@ export default function Login() {
           </form>
 
           <div className="mt-6 text-center">
-            <a
-              href="/"
-              className="text-sm text-[#555] hover:text-[#A0A0A0] transition-colors"
-            >
+            <a href="/" className="text-sm text-[#555] hover:text-[#A0A0A0] transition-colors">
               ← Back to public site
             </a>
           </div>
