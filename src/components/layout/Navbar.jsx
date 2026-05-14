@@ -9,13 +9,12 @@ const NAV_LINKS = [
   { label: 'Contact', href: '#contact' },
 ];
 
-// Logo mark — shows custom image if uploaded, otherwise text+initials box
+// Logo mark — custom image if uploaded, otherwise pure text (no box/square)
 function LogoMark({ companyName, accentColor, logoImage }) {
   const words = (companyName || 'BM Software').trim().split(/\s+/);
-  const initials = words.slice(0, 2).map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 
   return (
-    <div className="flex items-center gap-2.5">
+    <div className="flex items-center gap-2">
       {logoImage ? (
         <img
           src={logoImage}
@@ -23,19 +22,7 @@ function LogoMark({ companyName, accentColor, logoImage }) {
           className="shrink-0 object-contain"
           style={{ height: '65px', width: 'auto' }}
         />
-      ) : (
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-black text-[11px] tracking-tight"
-          style={{
-            background: accentColor,
-            color: '#000',
-            boxShadow: `0 4px 14px ${accentColor}40`,
-            letterSpacing: '-0.5px',
-          }}
-        >
-          {initials}
-        </div>
-      )}
+      ) : null}
       <span className="text-lg font-bold tracking-tight">
         <span style={{ color: accentColor }}>{words[0]}</span>
         {words.length > 1 && (
@@ -59,6 +46,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Scroll to section and always close the mobile menu
   const handleNav = (href) => {
     setOpen(false);
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
@@ -75,8 +63,9 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
+
           {/* Logo */}
-          <a href="#" className="group">
+          <a href="#" onClick={() => setOpen(false)} className="group">
             <LogoMark
               companyName={brand.companyName || 'BM Software'}
               accentColor={gold}
@@ -97,7 +86,7 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* CTA */}
+          {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             <a
               href="/admin"
@@ -113,10 +102,10 @@ export default function Navbar() {
             </Button>
           </div>
 
-          {/* Mobile toggle */}
+          {/* Mobile hamburger */}
           <button
             className="md:hidden p-2 text-[#A0A0A0] hover:text-white transition-colors"
-            onClick={() => setOpen(!open)}
+            onClick={() => setOpen((v) => !v)}
             aria-label="Toggle menu"
           >
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -131,6 +120,7 @@ export default function Navbar() {
           style={{ background: 'rgba(17,17,17,0.98)', borderBottom: `1px solid ${gold}25` }}
         >
           <div className="px-4 py-4 space-y-1">
+            {/* Section nav links */}
             {NAV_LINKS.map((link) => (
               <button
                 key={link.href}
@@ -140,7 +130,19 @@ export default function Navbar() {
                 {link.label}
               </button>
             ))}
-            <div className="pt-3 mt-3" style={{ borderTop: `1px solid ${gold}20` }}>
+
+            {/* Admin link — same gold colour as desktop */}
+            <a
+              href="/admin"
+              onClick={() => setOpen(false)}
+              className="block w-full px-3 py-2.5 text-sm font-medium rounded-lg transition-colors hover:bg-white/5"
+              style={{ color: gold }}
+            >
+              Admin
+            </a>
+
+            {/* Request Demo CTA */}
+            <div className="pt-3 mt-1" style={{ borderTop: `1px solid ${gold}20` }}>
               <Button className="w-full" onClick={() => handleNav('#contact')}>
                 Request Demo
               </Button>
