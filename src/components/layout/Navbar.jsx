@@ -102,14 +102,23 @@ export default function Navbar() {
             </Button>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden p-2 text-[#A0A0A0] hover:text-white transition-colors"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Mobile: Admin link + hamburger */}
+          <div className="md:hidden flex items-center gap-3">
+            <a
+              href="/admin"
+              className="text-sm font-medium transition-colors"
+              style={{ color: gold }}
+            >
+              Admin
+            </a>
+            <button
+              className="p-2 text-[#A0A0A0] hover:text-white transition-colors"
+              onClick={() => setOpen((v) => !v)}
+              aria-label="Toggle menu"
+            >
+              {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -130,16 +139,6 @@ export default function Navbar() {
                 {link.label}
               </button>
             ))}
-
-            {/* Admin link — same gold colour as desktop */}
-            <a
-              href="/admin"
-              onClick={() => setOpen(false)}
-              className="block w-full px-3 py-2.5 text-sm font-medium rounded-lg transition-colors hover:bg-white/5"
-              style={{ color: gold }}
-            >
-              Admin
-            </a>
 
             {/* Request Demo CTA */}
             <div className="pt-3 mt-1" style={{ borderTop: `1px solid ${gold}20` }}>
