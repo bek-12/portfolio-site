@@ -12,7 +12,13 @@ async function request(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  } catch {
+    // Network error — server is unreachable (offline, sleeping on Render free tier, etc.)
+    throw new Error('Cannot reach the server. Please wait a moment and try again.');
+  }
 
   // 204 No Content
   if (res.status === 204) return null;

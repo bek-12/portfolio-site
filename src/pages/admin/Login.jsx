@@ -21,7 +21,12 @@ export default function Login() {
     if (result.ok) {
       navigate('/admin/dashboard');
     } else {
-      setError(result.error || 'Invalid username or password.');
+      const isNetworkError = result.error?.includes('Cannot reach');
+      setError(
+        isNetworkError
+          ? 'Server is starting up — this can take 30–60 seconds on first load. Please try again.'
+          : result.error || 'Invalid username or password.'
+      );
       setLoading(false);
     }
   };
