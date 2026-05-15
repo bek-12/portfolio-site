@@ -514,7 +514,6 @@ function getStrength(pw) {
 // All three inputs are rendered directly — no inner component — to prevent
 // React from unmounting/remounting them on state changes (focus-loss bug).
 function ChangePasswordSection() {
-  const { brand, updateBrand } = useBrand();
   const { addToast } = useToast();
 
   const [currentPw, setCurrentPw]     = useState('');
@@ -529,11 +528,10 @@ function ChangePasswordSection() {
 
   const validate = () => {
     const e = {};
-    if (!currentPw)                        e.currentPw = 'Current password is required';
-    else if (currentPw !== brand.password) e.currentPw = 'Current password is incorrect';
-    if (!newPw)                            e.newPw = 'New password is required';
-    else if (newPw.length < 8)            e.newPw = 'Password must be at least 8 characters';
-    if (!confirmPw)                        e.confirmPw = 'Please confirm your new password';
+    if (!currentPw) e.currentPw = 'Current password is required';
+    if (!newPw)     e.newPw = 'New password is required';
+    else if (newPw.length < 8) e.newPw = 'Password must be at least 8 characters';
+    if (!confirmPw) e.confirmPw = 'Please confirm your new password';
     else if (newPw && confirmPw !== newPw) e.confirmPw = 'Passwords do not match';
     return e;
   };
@@ -548,10 +546,16 @@ function ChangePasswordSection() {
     try {
       await authAPI.changePassword(currentPw, newPw);
       setCurrentPw(''); setNewPw(''); setConfirmPw(''); setErrors({});
-      addToast({ message: 'Password updated successfully.' });
+      addToast({ message: 'Password updated successfully. Use your new password next time you log in.' });
     } catch (err) {
-      setErrors({ currentPw: err.message || 'Failed to update password.' });
-      addToast({ message: err.message || 'Failed to update password.', type: 'error' });
+      // API returns 401 if current password is wrong
+      const msg = err.message || 'Failed to update password.';
+      if (msg.includes('incorrect') || msg.includes('401')) {
+        setErrors({ currentPw: 'Current password is incorrect.' });
+      } else {
+        setErrors({ currentPw: msg });
+      }
+      addToast({ message: msg, type: 'error' });
     }
   };
 

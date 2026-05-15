@@ -10,7 +10,7 @@ const DEFAULTS = {
   fullName: 'Bereket Mebratu',
   email: 'mebratubereket94@gmail.com',
   phone: '+251 944 250 799',
-  password: 'BMSoftware2025!',
+  // NOTE: password is NOT stored here — it lives only in Neon via the API
 };
 
 function loadBrand() {
